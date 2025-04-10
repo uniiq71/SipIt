@@ -3,6 +3,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
@@ -10,7 +11,9 @@ public class Server implements Runnable {
     private int port;
     private ServerSocket serverSocket;
     private boolean running = false;
-    public List<Connection> connections = new CopyOnWriteArrayList<>();
+    private List<Connection> connections = new CopyOnWriteArrayList<>();
+    private List<Integer> gameCodes = new CopyOnWriteArrayList<>();
+    private List<Game> games = new CopyOnWriteArrayList<>();
 
     public Server(int port) {
         this.port = port;
@@ -80,5 +83,17 @@ public class Server implements Runnable {
 
     public void removeConnection(Connection connection) {
         connections.remove(connection);
+    }
+
+    public void createGame(Connection connection) {
+        Random rnd = new Random();
+        int gameCode;
+
+        do {
+            gameCode = 100000 + rnd.nextInt(999999);
+        } while (gameCodes.contains(gameCode));
+
+        gameCodes.add(gameCode);
+        games.add(new Game(gameCode,connection));
     }
 }

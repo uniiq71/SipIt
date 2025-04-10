@@ -6,15 +6,14 @@ import java.net.Socket;
 public class Connection implements Runnable {
     private Server server;
     private Socket socket;
-    private int id;
+    private int gameCode;
     private String userName;
     private ObjectInputStream inputStream;
     private ObjectOutputStream outputStream;
 
-    public Connection(Socket socket,String userName,int id) {
+    public Connection(Socket socket,String userName) {
         this.socket = socket;
         this.userName = userName;
-        this.id = id;
     }
 
     public Connection(Socket socket,Server server) {
@@ -59,10 +58,15 @@ public class Connection implements Runnable {
     }
 
     public void checkPacket(String data) {
-        switch (data) {
+        String[] dataArray = data.split(";");
+        switch (dataArray[0]) {
             case "join":
                 System.out.println(server.connectedUsers());
                 sendData("test");
+                break;
+            case "host":
+                userName = dataArray[1];
+                server.createGame(this);
                 break;
         }
     }
@@ -85,7 +89,7 @@ public class Connection implements Runnable {
     public String toString() {
         return "Connection{" +
                 "socket=" + socket +
-                ", id=" + id +
+                ", id=" + gameCode +
                 ", userName='" + userName + '\'' +
                 ", inputStream=" + inputStream +
                 ", outputStream=" + outputStream +

@@ -33,6 +33,10 @@ public class Connection implements Runnable {
         return socket;
     }
 
+    public void setGameCode(int gameCode) {
+        this.gameCode = gameCode;
+    }
+
     @Override
     public void run() {
         try {
@@ -59,14 +63,23 @@ public class Connection implements Runnable {
 
     public void checkPacket(String data) {
         String[] dataArray = data.split(";");
-        switch (dataArray[0]) {
+        String packetType = dataArray[0];
+        String receivedUserName = dataArray[1];
+        int receivedGameCode = Integer.parseInt(dataArray[2]);
+
+        switch (packetType) {
             case "join":
-                System.out.println(server.connectedUsers());
-                sendData("test");
+                if (server.getGameCodes().contains(receivedGameCode)) {
+                    userName = receivedUserName;
+                    server.joinGame(this, receivedGameCode);
+                    server.broadcastUsernames(gameCode);
+                } else sendData("conFail");
+                // TODO: else
                 break;
             case "host":
-                userName = dataArray[1];
+                userName = receivedUserName;
                 server.createGame(this);
+                sendData(gameCode+"");
                 break;
         }
     }
@@ -89,7 +102,7 @@ public class Connection implements Runnable {
     public String toString() {
         return "Connection{" +
                 "socket=" + socket +
-                ", id=" + gameCode +
+                ", gameCode=" + gameCode +
                 ", userName='" + userName + '\'' +
                 ", inputStream=" + inputStream +
                 ", outputStream=" + outputStream +

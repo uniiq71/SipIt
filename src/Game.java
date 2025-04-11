@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Game {
     private int gameCode;
@@ -8,6 +9,18 @@ public class Game {
     public Game(int gameCode, Connection user) {
         this.gameCode = gameCode;
         users.add(user);
+    }
+
+    public int getGameCode() {
+        return gameCode;
+    }
+
+    public List<Connection> getUsers() {
+        return users;
+    }
+
+    public String connectedUsers() {
+        return users.stream().map(Connection::getUserName).collect(Collectors.joining(";"));
     }
 
     public void addUser(Connection user) {

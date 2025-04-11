@@ -25,6 +25,10 @@ public class Server implements Runnable {
         }
     }
 
+    public List<Integer> getGameCodes() {
+        return gameCodes;
+    }
+
     public void start() {
         startConnectionMonitor();
         new Thread(this).start();
@@ -58,6 +62,7 @@ public class Server implements Runnable {
                     for (Connection conn : connections) {
                         System.out.println(" - " + conn);
                     }
+                    System.out.println(games);
                 }
                 try {
                     Thread.sleep(5000);
@@ -95,5 +100,32 @@ public class Server implements Runnable {
 
         gameCodes.add(gameCode);
         games.add(new Game(gameCode,connection));
+        connection.setGameCode(gameCode);
+    }
+
+    public void joinGame(Connection connection, int gameCode) {
+        Game joinedGame = findGameByCode(gameCode);
+        if (joinedGame != null) {
+            joinedGame.addUser(connection);
+            connection.setGameCode(gameCode);
+        }
+    }
+
+    public Game findGameByCode(int gameCode) {
+        for (Game game : games) {
+            if (game.getGameCode() == gameCode) {
+                return game;
+            }
+        }
+        return null;
+    }
+
+    public void broadcastGame(Game game, String data) {
+        game.getUsers().forEach(user -> user.sendData(data));
+    }
+
+    public void broadcastUsernames(int gameCode) {
+        Game game = findGameByCode(gameCode);
+        broadcastGame(game, game.connectedUsers());
     }
 }

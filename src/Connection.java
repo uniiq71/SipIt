@@ -64,20 +64,23 @@ public class Connection implements Runnable {
     public void checkPacket(String data) {
         String[] dataArray = data.split(";");
         String packetType = dataArray[0];
-        String receivedUserName = dataArray[1];
-        int receivedGameCode = Integer.parseInt(dataArray[2]);
+
+
 
         switch (packetType) {
             case "join":
+                int receivedGameCode = Integer.parseInt(dataArray[2]);
                 if (server.getGameCodes().contains(receivedGameCode)) {
-                    userName = receivedUserName;
-                    server.joinGame(this, receivedGameCode);
-                    server.broadcastUsernames(gameCode);
+                    if (server.checkIfUsernameIsValid(dataArray[1], receivedGameCode)) {
+                        userName = dataArray[1];
+                        server.joinGame(this, receivedGameCode);
+                        server.broadcastUsernames(gameCode);
+                    }
                 } else sendData("conFail");
                 // TODO: else
                 break;
             case "host":
-                userName = receivedUserName;
+                userName = dataArray[1];
                 server.createGame(this);
                 sendData(gameCode+"");
                 break;

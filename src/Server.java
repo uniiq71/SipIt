@@ -128,4 +128,9 @@ public class Server implements Runnable {
         Game game = findGameByCode(gameCode);
         broadcastGame(game, game.connectedUsers());
     }
+
+    public boolean checkIfUsernameIsValid(String userName, int gameCode) {
+        Game game = findGameByCode(gameCode);
+        return !game.connectedUserNames().contains(userName);
+    }
 }

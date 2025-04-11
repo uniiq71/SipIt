@@ -23,6 +23,10 @@ public class Game {
         return users.stream().map(Connection::getUserName).collect(Collectors.joining(";"));
     }
 
+    public List<String> connectedUserNames() {
+        return users.stream().map(Connection::getUserName).collect(Collectors.toList());
+    }
+
     public void addUser(Connection user) {
         users.add(user);
     }
